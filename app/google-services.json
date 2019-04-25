@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1048546740585",
+    "firebase_url": "https://kotmonitor-36704.firebaseio.com",
+    "project_id": "kotmonitor-36704",
+    "storage_bucket": "kotmonitor-36704.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1048546740585:android:5058d32d5ddcbb16",
+        "android_client_info": {
+          "package_name": "com.jgallardst.kothypervisor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1048546740585-agl0166166d0euihd3csfqt7vakhnmbo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jgallardst.kothypervisor",
+            "certificate_hash": "29fca051d5d8d649d5df8e9d6fd6fe988c80fe68"
+          }
+        },
+        {
+          "client_id": "1048546740585-2obn6t93bcpp1bvnsp81kbvohj7oa7hk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLAd4Dav1Ouk6vZuokcexsoBkn7Rebj-c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1048546740585-2obn6t93bcpp1bvnsp81kbvohj7oa7hk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
