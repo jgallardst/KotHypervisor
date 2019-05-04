@@ -20,6 +20,8 @@
         </activity>
         <activity android:name=".HypervisorsActivity">
         </activity>
+        <activity android:name=".NewHypervisorActivity">
+        </activity>
     </application>
 
 </manifest>

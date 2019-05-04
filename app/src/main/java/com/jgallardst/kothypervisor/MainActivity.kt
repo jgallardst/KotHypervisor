@@ -46,19 +46,24 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
     }
 
     private fun login() {
-        val email = login_email_edittext.text.toString()
-        val pass = login_pass_edittext.text.toString()
+        val email = login_email_edittext.text!!.toString() ?: ""
+        val pass = login_pass_edittext.text!!.toString()  ?: ""
 
         if (pass.isEmpty() || email.isEmpty()) {
             toast("Rellena ambos campos.")
             warn {"No rellena ambos campos"}
+            return
         }
 
         val mAuth = FirebaseAuth.getInstance()
 
         mAuth.signInWithEmailAndPassword(email, pass)
             .addOnCompleteListener {
-                if(!it.isSuccessful) return@addOnCompleteListener
+                if(!it.isSuccessful) {
+                    toast("Login fallido")
+                    warn { "Login fallido" }
+                    return@addOnCompleteListener
+                }
                 else {
                     info {"Login completado"}
                     toast("Login completado")

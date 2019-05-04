@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">KotHypervisor</string>
+    <string-array name="hosts">
+        <item>Xen</item>
+        <item>KVM</item>
+    </string-array>
 </resources>
