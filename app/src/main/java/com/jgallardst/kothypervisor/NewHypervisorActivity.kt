@@ -3,11 +3,9 @@ package com.jgallardst.kothypervisor
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.ArrayAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import com.xensource.xenapi.User
 import kotlinx.android.synthetic.main.activity_new_hypervisor.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
@@ -50,7 +48,7 @@ class NewHypervisorActivity : AppCompatActivity(), AnkoLogger {
 
         info { "User: $user. Address: $addr. Pass: $pass" }
 
-        val connRef = Connection(hostType, addr, user, pass, alias)
+        val connRef = ConnectionProperties(hostType, addr, user, pass, alias)
         path.setValue(connRef)
             .addOnSuccessListener {
                 info{ "Succesfuly added connection to database"}

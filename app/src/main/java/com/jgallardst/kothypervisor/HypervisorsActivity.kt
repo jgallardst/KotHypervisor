@@ -3,34 +3,43 @@ package com.jgallardst.kothypervisor
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.content.ContextCompat.startActivity
+import android.support.v7.app.AlertDialog
+import android.support.v7.widget.DividerItemDecoration
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.xensource.xenapi.User
+import com.google.firebase.database.*
+import com.jgallardst.kothypervisor.xen.PoolViewerActivity
+import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
+import kotlinx.android.synthetic.main.activity_hypervisors.*
 import kotlinx.android.synthetic.main.connections_row.view.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
+import org.jetbrains.anko.toast
 import org.jetbrains.anko.warn
 
 class HypervisorsActivity : AppCompatActivity(), AnkoLogger {
 
     private lateinit var inflater: LayoutInflater
+    private lateinit var connArray: MutableList<ConnectionProperties>
+    private lateinit var refArray: MutableList<DatabaseReference>
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_hypervisors)
         inflater = layoutInflater
 
+
+
         supportActionBar?.title = "Conexiones"
 
-        fetchUsers()
+        connections_rv.addItemDecoration( DividerItemDecoration(connections_rv.context, DividerItemDecoration.VERTICAL))
+
+        fetchConns()
 
     }
 
@@ -48,7 +57,10 @@ class HypervisorsActivity : AppCompatActivity(), AnkoLogger {
 
     }
 
-    private fun fetchUsers() {
+    private fun fetchConns() {
+        connArray = mutableListOf()
+        refArray = mutableListOf()
+
         val uid = FirebaseAuth.getInstance().uid
         val mconnDB = FirebaseDatabase.getInstance().getReference("/$uid/connections/")
         mconnDB.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -57,11 +69,39 @@ class HypervisorsActivity : AppCompatActivity(), AnkoLogger {
             }
 
             override fun onDataChange(p0: DataSnapshot) {
+                val adapter = GroupAdapter<ViewHolder>()
 
                 p0.children.forEach{
-                    val conn : Connection? = it.getValue(Connection::class.java)
-                    info( "Connection IP: ${conn?.address}" )
+                    val conn : ConnectionProperties? = it.getValue(ConnectionProperties::class.java)
+                    refArray.add(p0.ref)
+                    info( "ConnectionProperties IP: ${conn?.address}" )
+                    if(conn != null){
+                        adapter.add(ConnectionHolder(conn))
+                        connArray.add(conn)
+                    }
                 }
+                adapter.setOnItemClickListener { item, view ->
+                    val intent = Intent(view.context, PoolViewerActivity::class.java)
+                    val pos = adapter.getAdapterPosition(item)
+                    intent.putExtra("connection", connArray.get(pos))
+                    startActivity(intent)
+                }
+
+                adapter.setOnItemLongClickListener { item, view ->
+                    val pos = adapter.getAdapterPosition(item)
+                    val builder = AlertDialog.Builder(view.context)
+                    builder.setTitle("Borrar conexion").setMessage("¿Seguro que quieres eliminar la conexion?")
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton("Si"){dialog, which ->
+                            refArray.get(pos).removeValue()
+                            toast("Conexion eliminada")
+                            fetchConns()
+                        }
+                        .setNegativeButton("No", null).show();
+                    return@setOnItemLongClickListener true
+
+                }
+                connections_rv.adapter = adapter
 
             }
 
@@ -88,8 +128,9 @@ class HypervisorsActivity : AppCompatActivity(), AnkoLogger {
 
 }
 
-class ConnectionHolder(val conn: Connection) : Item<ViewHolder>(){
-    private val defaultURI = "https://firebasestorage.googleapis.com/v0/b/kotchat-test.appspot.com/o/images%2Fandroid_icon_256.png?alt=media&token=0f8f1d6e-f333-4c0a-92e1-2e5590bc413f"
+class ConnectionHolder(val conn: ConnectionProperties) : Item<ViewHolder>(){
+
+    val savedConn : ConnectionProperties = conn
 
     override fun bind(viewHolder: ViewHolder, position: Int) {
         viewHolder.itemView.fetched_alias_tv.text = conn.alias

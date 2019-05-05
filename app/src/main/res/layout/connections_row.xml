@@ -7,75 +7,69 @@
 
     <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="22dp"
             android:id="@+id/alias_tv" android:textSize="16sp"
             android:textStyle="bold" android:textColor="@android:color/black"
             android:text="Alias:"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="16dp" android:layout_marginTop="17dp"
-            app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@+id/dir_tv"/>
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="parent"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/fetched_alias_tv" android:textSize="14sp"
-            android:textStyle="bold" android:textColor="@android:color/black"
-            app:layout_constraintStart_toEndOf="@+id/alias_tv"
-            android:layout_marginStart="12dp" android:layout_marginTop="17dp"
-            app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="28dp"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            android:textColor="@android:color/black"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toEndOf="@+id/alias_tv"
+            android:layout_marginStart="8dp" android:layout_marginTop="12dp"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/fetched_dir_tv" android:textSize="14sp"
-            android:textStyle="bold" android:textColor="@android:color/black"
+            android:textColor="@android:color/black"
             app:layout_constraintStart_toEndOf="@+id/dir_tv"
-            android:layout_marginStart="10dp" android:layout_marginBottom="3dp"
+            android:layout_marginStart="8dp" android:layout_marginBottom="11dp"
             app:layout_constraintBottom_toBottomOf="parent"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/fetched_user_tv" android:textSize="14sp"
-            android:textStyle="bold" android:textColor="@android:color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="3dp" app:layout_constraintStart_toEndOf="@+id/user_tv"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="80dp" android:layout_marginStart="3dp" android:layout_marginTop="43dp"
-            app:layout_constraintTop_toTopOf="parent"/>
+            android:textColor="@android:color/black"
+            app:layout_constraintStart_toEndOf="@+id/user_tv"
+            android:layout_marginStart="8dp" android:layout_marginBottom="11dp"
+            app:layout_constraintBottom_toBottomOf="parent"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/fetched_hv_tv" android:textSize="14sp"
-            android:textStyle="bold" android:textColor="@android:color/black"
-            app:layout_constraintStart_toEndOf="@+id/soft_tv"
-            android:layout_marginStart="16dp" android:layout_marginTop="20dp"
-            app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="25dp"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            android:textColor="@android:color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="11dp" app:layout_constraintStart_toEndOf="@+id/soft_tv"
+            android:layout_marginStart="8dp"/>
     <TextView
             android:text="Direccion:"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/dir_tv" android:textSize="16sp"
             android:textStyle="bold" android:textColor="@android:color/black"
-            app:layout_constraintTop_toBottomOf="@+id/alias_tv" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="16dp" android:layout_marginBottom="3dp"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="parent"/>
     <TextView
             android:text="Usuario:"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/user_tv" android:textSize="16sp"
             android:textStyle="bold" android:textColor="@android:color/black"
-            android:layout_marginBottom="3dp"
-            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toEndOf="@+id/fetched_dir_tv"
-            android:layout_marginStart="124dp" app:layout_constraintEnd_toStartOf="@+id/fetched_user_tv"
-            android:layout_marginEnd="20dp"/>
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/dir_tv" android:layout_marginStart="140dp"/>
     <TextView
             android:text="Hipervisor:"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/soft_tv" android:textSize="16sp"
             android:textStyle="bold" android:textColor="@android:color/black"
-            android:layout_marginTop="17dp"
-            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toEndOf="@+id/fetched_alias_tv"
-            android:layout_marginStart="154dp"/>
+            android:layout_marginStart="164dp"
+            app:layout_constraintStart_toStartOf="@+id/fetched_alias_tv" android:layout_marginTop="10dp"
+            app:layout_constraintTop_toTopOf="parent"/>
 </android.support.constraint.ConstraintLayout>
