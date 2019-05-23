@@ -6,36 +6,39 @@ import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
 import android.view.Menu
 import android.view.MenuItem
-import com.jgallardst.kothypervisor.*
-import com.xensource.xenapi.*
+import com.jgallardst.kothypervisor.ConnectionProperties
+import com.jgallardst.kothypervisor.HypervisorsActivity
+import com.jgallardst.kothypervisor.R
+import com.xensource.xenapi.APIVersion
+import com.xensource.xenapi.Connection
+import com.xensource.xenapi.Session
+import com.xensource.xenapi.VM
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
-import kotlinx.android.synthetic.main.activity_pool_viewer.*
-import kotlinx.android.synthetic.main.pools_row.view.*
+import kotlinx.android.synthetic.main.activity_vms.*
+import kotlinx.android.synthetic.main.vm_rows.view.*
 import org.jetbrains.anko.*
 import java.lang.Exception
 import java.net.URL
 
-
-class PoolViewerActivity : AppCompatActivity(), AnkoLogger {
+class VMSActivity : AppCompatActivity() , AnkoLogger{
 
     private lateinit var connProperties : ConnectionProperties
     private lateinit var conn : Connection
     private lateinit var session : Session
-    private lateinit var hosts : Set<Host>
-    private lateinit var PoolList : MutableList<Pool>
+    private lateinit var VMs : Set<VM>
+    private lateinit var VMList : MutableList<VirtualM>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_pool_viewer)
+        setContentView(R.layout.activity_vms)
+        supportActionBar?.title = "VMs"
+        vm_rv.addItemDecoration( DividerItemDecoration(vm_rv.context, DividerItemDecoration.VERTICAL))
 
-        supportActionBar?.title = "Pools"
-
-
-        pools_rv.addItemDecoration( DividerItemDecoration(pools_rv.context, DividerItemDecoration.VERTICAL))
-        PoolList = mutableListOf()
         connProperties = intent.getParcelableExtra<ConnectionProperties>("connection")
+        VMList = mutableListOf()
+
         info {"Attempting connection to ip ${connProperties.address}"}
         doAsync {
             try {
@@ -46,15 +49,16 @@ class PoolViewerActivity : AppCompatActivity(), AnkoLogger {
                     connProperties.pass,
                     APIVersion.latest().toString()
                 )
-                hosts = Host.getAll(conn)
 
+                VMs = VM.getAll(conn)
 
                 uiThread {
-                    hostsStats()
+                    vmStats()
                     info {"Conexion correcta" }
                     toast("Conexion correcta")
                 }
-            } catch (e : Exception) {
+
+            } catch (e: Exception) {
                 uiThread {
                     error { e.message }
                     toast("Conexion fallida")
@@ -67,7 +71,7 @@ class PoolViewerActivity : AppCompatActivity(), AnkoLogger {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.pool_menu, menu)
+        menuInflater.inflate(R.menu.vm_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -79,8 +83,8 @@ class PoolViewerActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId){
-            R.id.menu_vms -> {
-                val intent = Intent(this, VMSActivity::class.java)
+            R.id.menu_pool -> {
+                val intent = Intent(this, PoolViewerActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 intent.putExtra("connection", connProperties)
                 startActivity(intent)
@@ -90,48 +94,48 @@ class PoolViewerActivity : AppCompatActivity(), AnkoLogger {
         return super.onOptionsItemSelected(item)
     }
 
-
-    private fun hostsStats() {
+    private fun vmStats(){
         val adapter = GroupAdapter<ViewHolder>()
-        PoolList = mutableListOf()
-
+        VMList = mutableListOf()
         doAsync {
-            for (host in hosts) {
-                val uuid = host.getUuid(conn)
-                val name = host.getNameLabel(conn)
-                val total_cpus = host.getHostCPUs(conn).size
-                var cpu_usage = 0.0
-                for (hc in host.getHostCPUs(conn)) {
-                    cpu_usage += hc.getUtilisation(conn)
-                }
-                cpu_usage /= total_cpus
-                val mem_percent = (1 - (host.computeFreeMemory(conn) * 1.0 / host.getMetrics(conn).getMemoryTotal(conn))) *100;
+            for (vm in VMs) {
+                if (vm.getIsControlDomain(conn) or  vm.getIsASnapshot(conn) or vm.getIsATemplate(conn)) continue
+                val uuid = vm.getUuid(conn)
+                val host_ip = vm.getResidentOn(conn).getAddress(conn)
+                val name = vm.getNameLabel(conn)
+                val status = vm.getPowerState(conn).toString()
+                var cpuUsage = 0.0
+                var diskUsage = 0.0
+                var memUsage = 0.0
+
+                // TODO: Metricas
 
                 uiThread {
-                    info {"Pool name: $name"}
-                    val pool = Pool(uuid ,name, total_cpus, cpu_usage , mem_percent )
-                    PoolList.add(pool)
-                    adapter.add(PoolHolder(pool))
+                    val vm_holder = VirtualM(uuid, name, status, cpuUsage, memUsage, diskUsage)
+                    VMList.add(vm_holder)
+                    adapter.add(VMHolder(vm_holder))
                 }
             }
             uiThread {
-                pools_rv.adapter = adapter
+                vm_rv.adapter = adapter
             }
         }
     }
 }
 
-class PoolHolder(val pool : Pool) : Item<ViewHolder>() {
-    override fun getLayout(): Int {
-        return R.layout.pools_row
-    }
+class VMHolder(val vm: VirtualM) : Item<ViewHolder>(){
 
     override fun bind(viewHolder: ViewHolder, position: Int) {
-        viewHolder.itemView.fetched_user_tv.text = "%.2f".format(pool.mem_usage) + " %"
-        viewHolder.itemView.fetched_alias_tv.text = pool.name
-        viewHolder.itemView.fetched_dir_tv.text = pool.total_cpus.toString()
-        viewHolder.itemView.fetched_hv_tv.text = "%.2f".format(pool.cpu_usage) + " %"
+        viewHolder.itemView.fill_cpu_tv.text = "%.2f".format(vm.cpu_usage) + " %"
+        viewHolder.itemView.fill_mem.text = "%.2f".format(vm.mem_usage) + " %"
+        viewHolder.itemView.fill_dsk_tv.text = "%.2f".format(vm.disk_usage) + " %"
+        viewHolder.itemView.fill_nombre_tv.text = vm.name
+        viewHolder.itemView.fill_estado_tv.text = vm.status
 
+    }
+
+    override fun getLayout(): Int {
+        return R.layout.vm_rows
     }
 
 }

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="64dp" tools:layout_editor_absoluteY="81dp">
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:id="@+id/alias_tv" android:textSize="16sp"
+            android:textStyle="bold" android:textColor="@android:color/black"
+            android:text="Nombre:"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="parent"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fetched_alias_tv" android:textSize="14sp"
+            android:textColor="@android:color/black"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toEndOf="@+id/alias_tv"
+            android:layout_marginStart="8dp" android:layout_marginTop="12dp"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fetched_dir_tv" android:textSize="14sp"
+            android:textColor="@android:color/black"
+            app:layout_constraintStart_toEndOf="@+id/dir_tv"
+            android:layout_marginStart="8dp" android:layout_marginBottom="11dp"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fetched_user_tv" android:textSize="14sp"
+            android:textColor="@android:color/black"
+            app:layout_constraintStart_toEndOf="@+id/user_tv"
+            android:layout_marginStart="8dp" android:layout_marginBottom="11dp"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fetched_hv_tv" android:textSize="14sp"
+            android:textColor="@android:color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="11dp" app:layout_constraintStart_toEndOf="@+id/soft_tv"
+            android:layout_marginStart="8dp"/>
+    <TextView
+            android:text="Num CPUs:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/dir_tv" android:textSize="16sp"
+            android:textStyle="bold" android:textColor="@android:color/black"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="parent"/>
+    <TextView
+            android:text="RAM Usada:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/user_tv" android:textSize="16sp"
+            android:textStyle="bold" android:textColor="@android:color/black"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/dir_tv" android:layout_marginStart="130dp"/>
+    <TextView
+            android:text="CPU Usada:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/soft_tv" android:textSize="16sp"
+            android:textStyle="bold" android:textColor="@android:color/black"
+            android:layout_marginStart="143dp"
+            app:layout_constraintStart_toStartOf="@+id/fetched_alias_tv"
+            android:layout_marginTop="10dp" app:layout_constraintTop_toTopOf="parent"/>
+</android.support.constraint.ConstraintLayout>
