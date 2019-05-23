@@ -73,7 +73,7 @@ class HypervisorsActivity : AppCompatActivity(), AnkoLogger {
 
                 p0.children.forEach{
                     val conn : ConnectionProperties? = it.getValue(ConnectionProperties::class.java)
-                    refArray.add(p0.ref)
+                    refArray.add(it.ref)
                     info( "ConnectionProperties IP: ${conn?.address}" )
                     if(conn != null){
                         adapter.add(ConnectionHolder(conn))
@@ -129,8 +129,6 @@ class HypervisorsActivity : AppCompatActivity(), AnkoLogger {
 }
 
 class ConnectionHolder(val conn: ConnectionProperties) : Item<ViewHolder>(){
-
-    val savedConn : ConnectionProperties = conn
 
     override fun bind(viewHolder: ViewHolder, position: Int) {
         viewHolder.itemView.fetched_alias_tv.text = conn.alias
