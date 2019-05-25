@@ -3,6 +3,7 @@ package com.jgallardst.kothypervisor
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.jgallardst.kothypervisor.kvm.KVMManagerActivity
 import com.jgallardst.kothypervisor.xen.PoolViewerActivity
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
@@ -82,10 +84,17 @@ class HypervisorsActivity : AppCompatActivity(), AnkoLogger {
                     }
                 }
                 adapter.setOnItemClickListener { item, view ->
-                    val intent = Intent(view.context, PoolViewerActivity::class.java)
                     val pos = adapter.getAdapterPosition(item)
-                    intent.putExtra("connection", connArray.get(pos))
-                    startActivity(intent)
+                    val conn = connArray.get(pos)
+                    if (conn.host == "Xen"){
+                        val intent = Intent(view.context, PoolViewerActivity::class.java)
+                        intent.putExtra("connection", connArray.get(pos))
+                        startActivity(intent)
+                    } else if (conn.host == "KVM"){
+                        val intent = Intent(view.context, KVMManagerActivity::class.java)
+                        intent.putExtra("connection", connArray.get(pos))
+                        startActivity(intent)
+                    }
                 }
 
                 adapter.setOnItemLongClickListener { item, view ->

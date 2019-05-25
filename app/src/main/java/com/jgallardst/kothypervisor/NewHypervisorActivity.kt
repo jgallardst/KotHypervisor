@@ -37,14 +37,25 @@ class NewHypervisorActivity : AppCompatActivity(), AnkoLogger {
 
         val hostType = spinner_host.selectedItem.toString()
         val addr = et_dir.text.toString()
-        val user = et_user.text.toString()
-        val pass = et_pass.text.toString()
+        var user = et_user.text.toString()
+        var pass = et_pass.text.toString()
         val alias = et_alias.text.toString()
 
-        if(alias.isEmpty() || addr.isEmpty() || user.isEmpty() || pass.isEmpty()){
-            toast("Rellena todos los campos")
-            return
+        if (hostType == "Xen") {
+
+            if (alias.isEmpty() || addr.isEmpty() || user.isEmpty() || pass.isEmpty()) {
+                toast("Rellena todos los campos")
+                return
+            }
+        } else {
+            if (alias.isEmpty() || addr.isEmpty()) {
+                toast("Rellena los campos de alias y direccion")
+                return
+            }
         }
+
+        if(pass.isEmpty()) pass = ""
+        if(user.isEmpty()) user = ""
 
         info { "User: $user. Address: $addr. Pass: $pass" }
 

@@ -35,6 +35,8 @@
         </activity>
         <activity android:name=".VMManagerActivity">
         </activity>
+        <activity android:name=".kvm.KVMManagerActivity">
+        </activity>
     </application>
 
 </manifest>
