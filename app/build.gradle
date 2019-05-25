@@ -36,7 +36,9 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'net.java.dev.vcc.thirdparty:xen-api:5.0.0-6'
     // https://mvnrepository.com/artifact/org.libvirt/libvirt
-    compile group: 'org.libvirt', name: 'libvirt', version: '0.5.1'
+    implementation group: 'org.libvirt', name: 'libvirt', version: '0.5.1'
+// https://mvnrepository.com/artifact/com.littocats.android/jna
+    implementation group: 'com.littocats.android', name: 'jna', version: '0.0.1'
 
     // https://mvnrepository.com/artifact/com.jcraft/jsch
     implementation group: 'com.jcraft', name: 'jsch', version: '0.1.55'
