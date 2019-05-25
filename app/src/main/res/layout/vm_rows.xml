@@ -48,19 +48,11 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/fill_dsk_tv"
-            android:textSize="16sp" android:textColor="@android:color/black"
-            android:textStyle="bold"
-            android:layout_marginBottom="3dp" app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/dsk_tv" android:layout_marginStart="10dp"/>
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/fill_mem"
             android:textSize="16sp" android:textColor="@android:color/black"
             android:textStyle="bold"
             android:layout_marginBottom="4dp" app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/mem_tv" android:layout_marginStart="10dp"/>
+            app:layout_constraintStart_toEndOf="@+id/mem_tv" android:layout_marginStart="8dp"/>
     <TextView
             android:text="CPU:"
             android:layout_width="wrap_content"
@@ -77,17 +69,7 @@
             android:id="@+id/mem_tv"
             android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:layout_marginBottom="3dp"
-            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toEndOf="@+id/cpu_tv"
-            android:layout_marginStart="100dp"/>
-    <TextView
-            android:text="DSK:"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/dsk_tv"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
             android:layout_marginBottom="4dp"
-            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toEndOf="@+id/mem_tv"
-            android:layout_marginStart="100dp"/>
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toEndOf="@+id/cpu_tv"
+            android:layout_marginStart="156dp"/>
 </android.support.constraint.ConstraintLayout>

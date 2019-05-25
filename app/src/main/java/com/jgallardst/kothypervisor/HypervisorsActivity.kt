@@ -21,6 +21,7 @@ import org.jetbrains.anko.info
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.warn
 
+
 class HypervisorsActivity : AppCompatActivity(), AnkoLogger {
 
     private lateinit var inflater: LayoutInflater

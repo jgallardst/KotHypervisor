@@ -25,11 +25,15 @@
         </activity>
         <activity android:name=".NewHypervisorActivity">
         </activity>
-        <activity android:name=".xen.PoolViewerActivity"
-            android:parentActivityName="com.jgallardst.kothypervisor.HypervisorsActivity" >
+        <activity
+                android:name=".xen.PoolViewerActivity"
+                android:parentActivityName=".HypervisorsActivity">
         </activity>
-        <activity android:name=".xen.VMSActivity"
-                  android:parentActivityName="com.jgallardst.kothypervisor.HypervisorsActivity" >
+        <activity
+                android:name=".xen.VMSActivity"
+                android:parentActivityName=".HypervisorsActivity">
+        </activity>
+        <activity android:name=".VMManagerActivity">
         </activity>
     </application>
 

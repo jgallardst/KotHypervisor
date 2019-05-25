@@ -3,6 +3,7 @@ package com.jgallardst.kothypervisor.xen
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.view.Menu
 import android.view.MenuItem
@@ -50,9 +51,8 @@ class PoolViewerActivity : AppCompatActivity(), AnkoLogger {
 
 
                 uiThread {
+                    toast ("Cargando Pools (Esto puede tardar)" )
                     hostsStats()
-                    info {"Conexion correcta" }
-                    toast("Conexion correcta")
                 }
             } catch (e : Exception) {
                 uiThread {
@@ -115,6 +115,7 @@ class PoolViewerActivity : AppCompatActivity(), AnkoLogger {
                 }
             }
             uiThread {
+                toast ("Pools cargados" )
                 pools_rv.adapter = adapter
             }
         }
