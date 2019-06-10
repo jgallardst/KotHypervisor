@@ -31,7 +31,7 @@ class VMManagerActivity : AppCompatActivity(), AnkoLogger {
     private var vm : VM? = null
     private lateinit var status : String
     private var ip_host : String? = "0.0.0.0"
-    private var vm_host : String? = "0.0.0.0"
+    private var vm_ip : String? = "0.0.0.0"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,36 +43,10 @@ class VMManagerActivity : AppCompatActivity(), AnkoLogger {
         val vm_uuid = intent.getStringExtra("uuid")
         val cpu = intent.getDoubleExtra("cpu", 0.0)
         val mem = intent.getDoubleExtra("mem", 0.0)
-        val dsk = intent.getDoubleExtra("dsk", 0.0)
+        connProperties = intent.getParcelableExtra<ConnectionProperties>("connection")
+
         status = intent.getStringExtra("status")
 
-        if(status.toLowerCase() == "running") {
-            cpu_fill_tv.text = "%.2f".format(cpu) + " %"
-
-            if (mem != -1.0) {
-                mem_fill_tv.text = "%.2f".format(mem) + " %"
-                vm_host = getIp(vm_uuid)
-                check_tv.setOnClickListener {
-                    if(pass_et.text.toString().isEmpty() || user_et.text.toString().isEmpty() || proc_et.text.toString().isEmpty()) {
-                        toast("Rellena los campos.")
-                        return@setOnClickListener
-                    }
-                    toast(getProcess(user_et.text.toString(), pass_et.text.toString(), proc_et.text.toString()))
-                }
-            }
-            else {
-                mem_fill_tv.text = "No guest additions."
-                check_tv.text = "No guest additions."
-                check_tv.isClickable = false
-            }
-        } else {
-            cpu_fill_tv.text = "Maquina apagada."
-            mem_fill_tv.text = "Maquina apagada."
-            check_tv.text = "Maquina apagada"
-            check_tv.isClickable = false
-        }
-
-        connProperties = intent.getParcelableExtra<ConnectionProperties>("connection")
 
         doAsync {
             try {
@@ -86,9 +60,14 @@ class VMManagerActivity : AppCompatActivity(), AnkoLogger {
 
                 vm = pickVM(VM.getAll(conn), vm_uuid)
 
-                ip_host = vm?.getResidentOn(conn)?.getAddress(conn)
+                if(status.toLowerCase() == "running") {
+                    ip_host = vm?.getResidentOn(conn)?.getAddress(conn)
 
-                info {"Ip del pool: $ip_host"}
+                    info { "Ip del pool: $ip_host" }
+                }
+
+                getIp(vm_uuid)
+
 
                 uiThread {
                     if (vm == null) {
@@ -117,17 +96,85 @@ class VMManagerActivity : AppCompatActivity(), AnkoLogger {
         }
 
 
+        if(status.toLowerCase() == "running") {
+            cpu_fill_tv.text = "%.2f".format(cpu) + " %"
+            info{"$mem"}
+            if (mem != -1.0) {
+                mem_fill_tv.text = "%.2f".format(mem) + " %"
+                check_tv.setOnClickListener {
+                    if(pass_et.text.toString().isEmpty() || user_et.text.toString().isEmpty() || proc_et.text.toString().isEmpty()) {
+                        toast("Rellena los campos.")
+                        return@setOnClickListener
+                    }
+                    getProcess(user_et.text.toString(), pass_et.text.toString(), proc_et.text.toString())
+                }
+            }
+            else {
+                mem_fill_tv.text = "No guest additions."
+                check_tv.text = "No guest additions."
+                check_tv.isClickable = false
+            }
+        } else {
+            cpu_fill_tv.text = "Maquina apagada."
+            mem_fill_tv.text = "Maquina apagada."
+            check_tv.text = "Maquina apagada"
+            check_tv.isClickable = false
+        }
+
 
     }
 
-    private fun getProcess(user: String, pass: String, proc: String): String {
-        try {
-            val jsch = JSch()
-            val session = jsch.getSession(user, vm_host, 22)
-            session.setPassword(pass)
-            var ret = "Error leyendo el estado de $proc"
-            val command = "systemctl status $proc | grep Active"
+    private fun getProcess(user: String, pass: String, proc: String) {
+        doAsync {
+            try {
+                val jsch = JSch()
+                val session = jsch.getSession(user, vm_ip, 22)
+                session.setPassword(pass)
+                val command = "service $proc status | grep Active"
 
+                val config = Properties()
+                config["StrictHostKeyChecking"] = "no"
+                config["PreferredAuthentications"] = "password"
+                session.setConfig(config)
+                session.connect()
+
+                // SSH Channel
+                val channelssh = session.openChannel("exec") as ChannelExec
+                var baos = ByteArrayOutputStream()
+                channelssh.outputStream = baos
+                info { "Command: $command" }
+                channelssh.setCommand(command)
+                channelssh.connect()
+                while (channelssh.isConnected) {
+                    continue
+                }
+
+
+                val ret = baos.toString()
+                info {"$ret"}
+                uiThread {
+                    toast(ret)
+                }
+            } catch (e: Exception) {
+                uiThread {
+
+                    error { "${e.message}" }
+                    toast("Error leyendo el estado de $proc")
+                }
+            }
+        }
+    }
+
+    private fun getIp(uuid: String){
+        doAsync {
+
+            uiThread {
+                info { "Getting ip..." }
+            }
+            val command = "xe vm-list params=networks uuid=" + uuid
+            val jsch = JSch()
+            val session = jsch.getSession(connProperties.user, ip_host, 22)
+            session.setPassword(connProperties.pass)
             val config = Properties()
             config["StrictHostKeyChecking"] = "no"
             config["PreferredAuthentications"] = "password"
@@ -138,62 +185,34 @@ class VMManagerActivity : AppCompatActivity(), AnkoLogger {
             val channelssh = session.openChannel("exec") as ChannelExec
             var baos = ByteArrayOutputStream()
             channelssh.outputStream = baos
-            baos = ByteArrayOutputStream()
-            channelssh.outputStream = baos
-            info { "Command: $command" }
+            uiThread {
+                info { "Command: $command" }
+            }
+
             channelssh.setCommand(command)
-            channelssh.connect(3000)
+            channelssh.connect()
+
             while (channelssh.isConnected) {
-                info { "Holding ssh vm command." }
                 continue
             }
 
-            if(baos.toString().split(" ").size > 2){
-                ret = baos.toString().split(" ")[1]
-            }
+            channelssh.disconnect()
 
-            return ret
-        } catch (e : JSchException) {
-            return ("Error leyendo el estado de $proc")
-        }
-    }
+            val toParse = baos.toString().split(" ")
 
-    private fun getIp(uuid: String) : String{
-        val command = "xe vm-list params=networks uuid=" + uuid
-        val jsch = JSch()
-        val session = jsch.getSession(connProperties.user, ip_host, 22)
-        session.setPassword(connProperties.pass)
-        val config = Properties()
-        config["StrictHostKeyChecking"] = "no"
-        config["PreferredAuthentications"] = "password"
-        session.setConfig(config)
-        session.connect()
-
-        // SSH Channel
-        val channelssh = session.openChannel("exec") as ChannelExec
-        var baos = ByteArrayOutputStream()
-        channelssh.outputStream = baos
-
-        channelssh.setCommand(command)
-        channelssh.connect()
-
-        while(channelssh.isConnected){
-            continue
-        }
-
-        channelssh.disconnect()
-
-        val toParse = baos.toString().split(" ")
-
-        for (part in toParse){
-            if(part.startsWith("1")) {
-                info {"IP addr: $part"}
-                return part
+            for (part in toParse) {
+                if (part.startsWith("1")) {
+                    uiThread {
+                        var ip : String = "0.0.0.0"
+                        if (part.endsWith(";")){
+                            ip = part.dropLast(1)
+                        } else ip = part
+                        info { "IP addr: $ip" }
+                        vm_ip = ip
+                    }
+                }
             }
         }
-
-        return "0.0.0.0"
-
     }
 
     private fun pickVM(VMs : Set<VM>, uuid: String) : VM? {

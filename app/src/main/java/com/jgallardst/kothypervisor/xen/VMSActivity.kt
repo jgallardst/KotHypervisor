@@ -119,8 +119,17 @@ class VMSActivity : AppCompatActivity() , AnkoLogger{
                     info{"VM $name running on $addr"}
                     val cpuNum = vm.getMetrics(conn).getVCPUsNumber(conn)
                     cpuUsage = getCPUMetrics(addr, uuid, cpuNum)
-                    memUsage = getMemMetrics(addr, uuid)
-                    diskUsage = getDiskUsage(addr, uuid)
+                    val pvd = vm.getGuestMetrics(conn).getPVDriversVersion(conn)
+                    val version = pvd.get("micro")
+
+                    if(version.toString() != "-1") {
+                        memUsage = getMemMetrics(addr, uuid)
+                        diskUsage = -1.0
+                    }
+                    else {
+                        memUsage = -1.0
+                        diskUsage = -1.0
+                    }
                 }
 
                 uiThread {
@@ -140,9 +149,7 @@ class VMSActivity : AppCompatActivity() , AnkoLogger{
                 intent.putExtra("uuid", VMList.get(pos).uuid)
                 intent.putExtra("status", VMList.get(pos).status)
                 intent.putExtra("connection", connProperties)
-                if(VMList.get(pos).mem_usage == -1.0)
-                    intent.putExtra("mem", VMList.get(pos).mem_usage)
-                else intent.putExtra("mem", -1.0)
+                intent.putExtra("mem", VMList.get(pos).mem_usage)
                 intent.putExtra("dsk", VMList.get(pos).disk_usage)
                 intent.putExtra("cpu", VMList.get(pos).cpu_usage)
                 startActivity(intent)
@@ -183,6 +190,7 @@ class VMSActivity : AppCompatActivity() , AnkoLogger{
     }
 
     private fun getMemMetrics(host_addr : String, uuid: String) : Double {
+
         val jsch = JSch()
         val session = jsch.getSession(connProperties.user, host_addr, 22)
         session.setPassword(connProperties.pass)
@@ -195,7 +203,7 @@ class VMSActivity : AppCompatActivity() , AnkoLogger{
         session.connect()
 
         // SSH Channel
-        val channelssh = session.openChannel("exec") as ChannelExec
+        var channelssh = session.openChannel("exec") as ChannelExec
         var baos = ByteArrayOutputStream()
         channelssh.outputStream = baos
         val total_mem_command = "xe vm-data-source-query data-source=memory" +  " uuid=" + uuid
@@ -210,35 +218,34 @@ class VMSActivity : AppCompatActivity() , AnkoLogger{
 
         // Total mem en bits, free mem en kbits, convertimos.
         total_mem = baos.toString().toDouble() / 1024
+        info {"Total mem: ${total_mem}"}
 
-        baos = ByteArrayOutputStream()
-        channelssh.outputStream = baos
+        channelssh = session.openChannel("exec") as ChannelExec
+        val mem = ByteArrayOutputStream()
+        channelssh.outputStream = mem
         info { "Command: $free_mem_command" }
         channelssh.setCommand(free_mem_command)
         try {
-            channelssh.connect(3000)
+            channelssh.connect()
             while (channelssh.isConnected) {
-                info { "Holding ssh vm command." }
                 continue
             }
         } catch (e :JSchException) {
-            warn { "No guest additions installed" }
+            warn { "No guest additions installed ${e.message}" }
             return -1.0
         }
-        if(baos.toString().isEmpty()) {
+        info {"Free memory: ${mem}" }
+
+        if(mem.toString().isEmpty()) {
             warn { "No guest additions installed" }
             return -1.0
         }
 
-        if(Character.isDigit(baos.toString()[0]))
-            free_mem = parseDouble(baos.toString())
-        else{
-            warn { "No guest additions installed" }
-            return -1.0
-        }
+        free_mem = parseDouble(mem.toString())
+
         session.disconnect()
 
-        return ((total_mem - free_mem) / total_mem)
+        return (((total_mem - free_mem) / total_mem) * 100)
     }
 
     private fun getDiskUsage(host_addr : String, uuid: String) : Double {
